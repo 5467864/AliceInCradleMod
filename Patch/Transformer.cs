@@ -11,6 +11,7 @@ namespace AliceInCradle.Patch
         [HarmonyTranspiler]
         public static IEnumerable<CodeInstruction> ReelExecuter_applyEffectToIK_Transpiler(IEnumerable<CodeInstruction> instructions)
         {
+            // 修改使用宝箱效果转轮的最高获取数量
             return new CodeMatcher(instructions)
                 .MatchForward(false, 
                     new CodeMatch(i => i.opcode == OpCodes.Ldc_I4_S && i.operand.ToString() == "99")

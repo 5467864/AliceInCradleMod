@@ -117,7 +117,7 @@ namespace AliceInCradle.Patch
         }
 
         [HarmonyPatch(typeof(NelItem), "fnGetDetailItemReel")]
-        [HarmonyPrefix] // 注入 获取详情卷轴信息 替换返回值
+        [HarmonyPrefix] // 注入 获取详细卷轴信息 替换返回值
         public static bool NelItem_fnGetDetailItemReel_Prefix(NelItem Itm, int grade, string def, ref string __result)
         {
             var text = TX.slice(Itm.key, "itemreelC_".Length);
@@ -191,6 +191,15 @@ namespace AliceInCradle.Patch
             if (!NoMpDamage.Value) return true;
             __result = __instance.mp;
             return false;
+        }
+        
+        [HarmonyPatch(typeof(M2PrSkill), "AtkMul")]
+        [HarmonyPrefix]
+        private static void M2PrSkill_AtkMul_Prefix(NelAttackInfo Atk, ref float hpdmg, ref float mpdmg)
+        {
+            hpdmg *= HpMultiply.Value;
+            mpdmg *= MpMultiply.Value;
+            // EVENT.LogInfo($"M2PrSkill_AtkMul_Prefix: {hpdmg}, {mpdmg}");
         }
     }
 }

@@ -8,7 +8,6 @@ using BepInEx.Logging;
 using HarmonyLib;
 using HarmonyLib.Tools;
 using UnityEngine;
-using m2d;
 using nel;
 
 // ReSharper disable InconsistentNaming
@@ -31,9 +30,8 @@ namespace AliceInCradle
         public static ItemStorage StEnhancer;
         
         public static ReelManager ReelM;
-
-
-        public static M2Attackable Noel;
+        
+        public static PRNoel Noel;
         
         public static bool WindowDisplay;
         public static Rect WindowRect;
@@ -51,6 +49,7 @@ namespace AliceInCradle
             Plugin = new GameObject("PluginObject");
             ConfigManage = new ConfigManage(Config);
             
+            // 修改控制台字体为黑体
             ConsoleHelper.SetCurrentFont("simhei", 16);
 
             if (_harmony == null)
@@ -64,6 +63,7 @@ namespace AliceInCradle
                 LOG.LogMessage("已修补游戏！");
             }
             
+            // 通过反射加载嵌入dll的ModUI
             var assembly = Assembly.GetExecutingAssembly();
             ModUI.UIBundle = AssetBundle.LoadFromStream(assembly.GetManifestResourceStream("AliceInCradle.ModUI"));
             ReleaseFile(assembly);
@@ -73,12 +73,14 @@ namespace AliceInCradle
 
         private void OnDestroy()
         {
+            // 是的，Loader的生命周期就这点
             WindowRect = new Rect(300f, 300f, 500f, 300f);
             LOG.LogMessage("对象销毁!");
         }
 
         private static void ReleaseFile(Assembly assembly)
         {
+            // Mono.ModUI.PadRightEx 的 Encoding.GetEncoding("UTF-8") 需要;
             if (File.Exists(Paths.PluginPath + "\\I18N.dll") &&
                 File.Exists(Paths.PluginPath + "\\I18N.CJK.dll")) return;
             var stream = assembly.GetManifestResourceStream("AliceInCradle.api.I18N.dll");

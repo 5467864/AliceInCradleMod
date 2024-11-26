@@ -3,7 +3,6 @@ using System.Text;
 using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEngine.UI;
-using m2d;
 using nel;
 using XX;
 using AliceInCradle.Patch;
@@ -19,6 +18,7 @@ namespace AliceInCradle.Mono
         private GameObject _ui;
         private Text _text1;
         private Text _text2;
+        private Text _text3;
         private Toggle _toggle1;
         private Toggle _toggle2;
         private Toggle _toggle3;
@@ -43,6 +43,7 @@ namespace AliceInCradle.Mono
         {
             _text1 = UI.transform.Find("BG/Text1").GetComponent<Text>();
             _text2 = UI.transform.Find("BG/Text2").GetComponent<Text>();
+            _text3 = UI.transform.Find("BG/Text3").GetComponent<Text>();
             _toggle1 = UI.transform.Find("BG/Toggle1").GetComponent<Toggle>();
             _toggle2 = UI.transform.Find("BG/Toggle2").GetComponent<Toggle>();
             _toggle3 = UI.transform.Find("BG/Toggle3").GetComponent<Toggle>();
@@ -54,6 +55,7 @@ namespace AliceInCradle.Mono
             if (Noel is null) return;
             _text1.text = $"血量 {Noel.hp}/{Noel.maxhp}";
             _text2.text = $"魔力 {Noel.mp}/{Noel.maxmp}";
+            _text3.text = $"HP: {ConfigManage.HpMultiply.Value} MP: {ConfigManage.MpMultiply.Value}";
         }
 
         private void UpdateToggle()
@@ -81,6 +83,8 @@ namespace AliceInCradle.Mono
             var toggle1 = ui.transform.Find("BG/Toggle1").GetComponent<Toggle>();
             var toggle2 = ui.transform.Find("BG/Toggle2").GetComponent<Toggle>();
             var toggle3 = ui.transform.Find("BG/Toggle3").GetComponent<Toggle>();
+            var slider1 = ui.transform.Find("BG/Slider1").GetComponent<Slider>();
+            var slider2 = ui.transform.Find("BG/Slider2").GetComponent<Slider>();
 
             btn1.transform.Find("Text").GetComponent<Text>().text = "输出金币";
             btn1.onClick.AddListener(() =>
@@ -149,28 +153,40 @@ namespace AliceInCradle.Mono
                 ConfigManage.EnhancedItemList.Value = value;
             });
 
+            slider1.onValueChanged.AddListener(value =>
+            {
+                ConfigManage.HpMultiply.Value = X.IntC(value);
+            });
+            slider2.onValueChanged.AddListener(value =>
+            {
+                ConfigManage.MpMultiply.Value = X.IntC(value);
+            });
+
             toggle1.isOn = ConfigManage.NoHpDamage.Value;
             toggle2.isOn = ConfigManage.NoMpDamage.Value;
             toggle3.isOn = ConfigManage.EnhancedItemList.Value;
+            slider1.value = ConfigManage.HpMultiply.Value;
+            slider1.value = ConfigManage.MpMultiply.Value;
             
             ui.AddComponent<ModUIDrag>();
         }
         
         private static int CompareByName(ReelExecuter executor1, ReelExecuter executor2)
         {
+            // 先 加法 再 乘法 后 随机
             return string.CompareOrdinal(executor1.etype.ToString(), executor2.etype.ToString());
         }
 
-        private static M2Attackable GetNoel()
+        private static PRNoel GetNoel()
         {
-            return FindObjectsOfType<M2Attackable>() is not { } scripts
+            return FindObjectsOfType<PRNoel>() is not { } scripts
                 ? null
                 : scripts.FirstOrDefault(script => script.name == "Noel");
         }
         
         private static string PadRightEx(string str, int totalByteCount)
         {
-            // 去除 不可见的控制字符和未使用的代码点 例如 (\u0008 BS) WTF!
+            // 去除 不可见的控制字符和未使用的代码点 例如 (\u0008 BS) WTF 为什么会有这个!
             var s = Regex.Replace(str, @"[\p{C}]", "");
             var coding = Encoding.GetEncoding("UTF-8");
             var count = s.ToCharArray().Count(ch => coding.GetByteCount(ch.ToString()) > 1);

@@ -19,6 +19,9 @@ namespace AliceInCradle
 
         public static ConfigEntry<bool> Active;
         public static ConfigEntry<Vector3> Pos;
+        
+        public static ConfigEntry<int> HpMultiply;
+        public static ConfigEntry<int> MpMultiply;
 
         public ConfigManage(ConfigFile config)
         {
@@ -59,6 +62,14 @@ namespace AliceInCradle
                 "EnhancedItemList",
                 true,
                 "增强宝箱物品表");
+            HpMultiply = config.Bind("功能",
+                "HpMultiply",
+                1,
+                "HP伤害倍增");
+            MpMultiply = config.Bind("功能",
+                "MpMultiply",
+                1,
+                "MP伤害倍增");
             
             Active = config.Bind("界面",
                 "Active",

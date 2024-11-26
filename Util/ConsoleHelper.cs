@@ -3,6 +3,7 @@ using System.Runtime.InteropServices;
 
 // ReSharper disable InconsistentNaming
 
+// ReSharper disable once CheckNamespace
 public static class ConsoleHelper
 {
     //表示固定宽度 TrueType 字体的类型
@@ -48,14 +49,14 @@ public static class ConsoleHelper
     {
         // Console.WriteLine("Set Current Font: " + font);
 
-        FontInfo before = new FontInfo
+        var before = new FontInfo
         {
             cbSize = Marshal.SizeOf<FontInfo>()
         };
 
         if (GetCurrentConsoleFontEx(ConsoleOutputHandle, false, ref before))
         {
-            FontInfo set = new FontInfo
+            var set = new FontInfo
             {
                 cbSize = Marshal.SizeOf<FontInfo>(),
                 nFont = 0,
@@ -73,7 +74,7 @@ public static class ConsoleHelper
                 throw new System.ComponentModel.Win32Exception(ex);
             }
 
-            FontInfo after = new FontInfo
+            var after = new FontInfo
             {
                 cbSize = Marshal.SizeOf<FontInfo>()
             };
