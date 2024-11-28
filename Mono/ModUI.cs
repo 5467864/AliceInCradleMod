@@ -110,24 +110,21 @@ namespace AliceInCradle.Mono
             btn4.transform.Find("Text").GetComponent<Text>().text = "输出物品表缓存";
             btn4.onClick.AddListener(() =>
             {
-                foreach (var itemReelContainer in Inject.OrigReels)
+                foreach (var key in Inject.Reels.Keys)
                 {
-                    EVENT.LogInfo($"原始物品表: {itemReelContainer.Key}");
-                }
-                foreach (var itemReelContainer in Inject.RandReels)
-                {
-                    EVENT.LogInfo($"增强物品表: {itemReelContainer.Key}");
+                    EVENT.LogInfo($"物品表: {key}");
                 }
             });
             btn5.transform.Find("Text").GetComponent<Text>().text = "随机物品表";
             btn5.onClick.AddListener(() =>
             {
-                foreach (var entity in Inject.RandReels)
+                foreach (var entity in Inject.Reels)
                 {
-                    var orig = Inject.OrigReels[entity.Key].AContent;
-                    for (var i = 0; i < entity.Value.AContent.Count; i++)
+                    var orig = entity.Value[0].AContent;
+                    var rand = entity.Value[1].AContent;
+                    for (var i = 0; i < orig.Count; i++)
                     {
-                        entity.Value.AContent[i].count = Random.Range((orig[i].count - 1) * 100, orig[i].count * 100);
+                        rand[i].count = Random.Range((orig[i].count - 1) * 100, orig[i].count * 100);
                     }
                 }
             });
@@ -166,7 +163,7 @@ namespace AliceInCradle.Mono
             toggle2.isOn = ConfigManage.NoMpDamage.Value;
             toggle3.isOn = ConfigManage.EnhancedItemList.Value;
             slider1.value = ConfigManage.HpMultiply.Value;
-            slider1.value = ConfigManage.MpMultiply.Value;
+            slider2.value = ConfigManage.MpMultiply.Value;
             
             ui.AddComponent<ModUIDrag>();
         }

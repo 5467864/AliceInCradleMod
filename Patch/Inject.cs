@@ -17,9 +17,8 @@ namespace AliceInCradle.Patch
     public class Inject
     {
         private static readonly ManualLogSource EVENT = Loader.EVENT;
-
-        public static readonly Dictionary<string, ReelManager.ItemReelContainer> OrigReels = new();
-        public static readonly Dictionary<string, ReelManager.ItemReelContainer> RandReels = new();
+        
+        public static readonly Dictionary<string, ReelManager.ItemReelContainer[]> Reels = new();
 
         [HarmonyPatch(typeof(MosaicShower), "FnDrawMosaic")]
         [HarmonyPrefix] // 去马赛克
@@ -70,23 +69,22 @@ namespace AliceInCradle.Patch
                 return false;
             }
 
-            if (!OrigReels.TryGetValue(__instance.AStackIR[0].tx_key, out __result))
+            if (!Reels.ContainsKey(__instance.AStackIR[0].tx_key))
             {
                 var ir = __instance.AStackIR[0];
                 var orig = new ReelManager.ItemReelContainer(ir.key, ir.ColSet);
                 ir.AContent.ForEach(i =>
                     {
                         orig.AContent.Add(new NelItemEntry(i.Data, i.count, i.grade));
-                        i.count = Random.Range((i.count - 1) * 100, i.count * 100);
+                        i.count = Random.Range(X.Mx(i.count - 1 , 0) * 100, X.Mx(i.count , 1) * 100);
                     }
                 );
-                OrigReels.Add(ir.tx_key, orig);
-                RandReels.Add(ir.tx_key, ir);
+                Reels.Add(ir.tx_key, new []{orig, ir});
                 EVENT.LogInfo("???ADD:"+ir.tx_key);
             }
             __result = EnhancedItemList.Value
                 ? __instance.AStackIR[0]
-                : OrigReels[__instance.AStackIR[0].tx_key];
+                : Reels[__instance.AStackIR[0].tx_key][0];
             return false;
         }
         
@@ -95,24 +93,23 @@ namespace AliceInCradle.Patch
         public static bool getDataList_Prefix(M2EventItem_ItemSupply __instance,ref bool is_reel,ref NelItemEntry[] __result)
         {
             var ir = __instance.IReel;
-            if (!OrigReels.ContainsKey(ir.tx_key))
+            if (!Reels.ContainsKey(ir.tx_key))
             {
                 var orig = new ReelManager.ItemReelContainer(ir.key, ir.ColSet);
                 ir.AContent.ForEach(i =>
                     {
                         orig.AContent.Add(new NelItemEntry(i.Data, i.count, i.grade));
-                        i.count = Random.Range((i.count - 1) * 100, i.count * 100);
+                        i.count = Random.Range(X.Mx(i.count - 1 , 0) * 100, X.Mx(i.count , 1) * 100);
                     }
                 );
-                OrigReels.Add(ir.tx_key, orig);
-                RandReels.Add(ir.tx_key, ir);
+                Reels.Add(ir.tx_key, new []{orig, ir});
                 EVENT.LogInfo("ADD:"+ir.tx_key);
             }
             
             is_reel = __instance.LpCon.is_reel;
             __result = EnhancedItemList.Value
                 ? __instance.IReel.ToArray()
-                : OrigReels[__instance.IReel.tx_key].ToArray();
+                : Reels[__instance.IReel.tx_key][0].ToArray();
             return false;
         }
 
@@ -124,20 +121,19 @@ namespace AliceInCradle.Patch
             var ir = ReelManager.GetIR(text);
             if (ir != null)
             {
-                if (!OrigReels.ContainsKey(ir.tx_key))
+                if (!Reels.ContainsKey(ir.tx_key))
                 {
                     var orig = new ReelManager.ItemReelContainer(ir.key, ir.ColSet);
                     ir.AContent.ForEach(i =>
                         {
                             orig.AContent.Add(new NelItemEntry(i.Data, i.count, i.grade));
-                            i.count = Random.Range((i.count - 1) * 100, i.count * 100);
+                            i.count = Random.Range(X.Mx(i.count - 1 , 0) * 100, X.Mx(i.count , 1) * 100);
                         }
                     );
-                    OrigReels.Add(ir.tx_key, orig);
-                    RandReels.Add(ir.tx_key, ir);
+                    Reels.Add(ir.tx_key, new []{orig, ir});
                     EVENT.LogInfo("ADD:"+ir.tx_key);
                 }
-                __result = EnhancedItemList.Value ? ir.listupItems("／") : OrigReels[ir.tx_key].listupItems("／");
+                __result = EnhancedItemList.Value ? ir.listupItems("／") : Reels[ir.tx_key][0].listupItems("／");
                 return false;
             }
             __result = "<ERROR> No Specfic ItemReel:\n" + text;
