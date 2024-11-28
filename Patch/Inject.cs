@@ -127,7 +127,7 @@ namespace AliceInCradle.Patch
                     ir.AContent.ForEach(i =>
                         {
                             orig.AContent.Add(new NelItemEntry(i.Data, i.count, i.grade));
-                            i.count = Random.Range(X.Mx(i.count - 1 , 0) * 100, X.Mx(i.count , 1) * 100);
+                            i.count = Random.Range(X.Mx(i.count - 1, 0) * 100, X.Mx(i.count, 1) * 100);
                         }
                     );
                     Reels.Add(ir.tx_key, new []{orig, ir});
@@ -166,6 +166,15 @@ namespace AliceInCradle.Patch
                 return !sfs[2].GetMethod().Name.Equals("applyHpDamageSimple");
             }
             return true;
+        }
+        
+        [HarmonyPatch(typeof(PR), "applyDamage", typeof(NelAttackInfo), typeof(bool) )]
+        [HarmonyPrefix]
+        private static bool PR_applyDamage_Prefix(ref int __result)
+        {
+            if (!NoHpDamage.Value) return true;
+            __result = 0;
+            return false;
         }
         
         [HarmonyPatch(typeof(M2Attackable), "applyMpDamage")]

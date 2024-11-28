@@ -29,6 +29,7 @@ namespace AliceInCradle.Mono
             {
                 _ui = UIBundle.LoadAsset<GameObject>("ModUI");
             }
+
             // 设置是否显示
             _ui.SetActive(ConfigManage.Active.Value);
             // 实例化
@@ -89,7 +90,8 @@ namespace AliceInCradle.Mono
             btn1.transform.Find("Text").GetComponent<Text>().text = "输出金币";
             btn1.onClick.AddListener(() =>
             {
-                EVENT.LogInfo($"GOLD: {CoinStorage.Acount[0],-9}CRAFTS: {CoinStorage.Acount[1],-9}JUICE: {CoinStorage.Acount[2],-9}");
+                EVENT.LogInfo(
+                    $"GOLD: {CoinStorage.Acount[0],-9}CRAFTS: {CoinStorage.Acount[1],-9}JUICE: {CoinStorage.Acount[2],-9}");
             });
             btn2.transform.Find("Text").GetComponent<Text>().text = "输出背包物品";
             btn2.onClick.AddListener(() =>
@@ -98,7 +100,8 @@ namespace AliceInCradle.Mono
                 StInventory.row_max = 99;
                 foreach (var row in StInventory.ARow)
                 {
-                    EVENT.LogInfo($"{PadRightEx(row.Data.getLocalizedName(0),20)}序号: {row.Info.newer,-4} 数量: {row.Info.total,-4} 堆叠: {StInventory.getItemStockable(row.Data),-4} ({TX.join(",", row.Info.Agrade)})"); 
+                    EVENT.LogInfo(
+                        $"{PadRightEx(row.Data.getLocalizedName(0), 20)}序号: {row.Info.newer,-4} 数量: {row.Info.total,-4} 堆叠: {StInventory.getItemStockable(row.Data),-4} ({TX.join(",", row.Info.Agrade)})");
                 }
             });
             btn3.transform.Find("Text").GetComponent<Text>().text = "无限存储";
@@ -124,13 +127,13 @@ namespace AliceInCradle.Mono
                     var rand = entity.Value[1].AContent;
                     for (var i = 0; i < orig.Count; i++)
                     {
-                        rand[i].count = Random.Range((orig[i].count - 1) * 100, orig[i].count * 100);
+                        rand[i].count = Random.Range(X.Mx(orig[i].count - 1, 0) * 100, X.Mx(orig[i].count, 1) * 100);
                     }
                 }
             });
             btn6.transform.Find("Text").GetComponent<Text>().text = "转轮排序";
             btn6.onClick.AddListener(() => { ReelM.AReel.Sort(CompareByName); });
-            
+
             toggle1.GetComponent<RectTransform>().sizeDelta += new Vector2(36, 0);
             toggle1.GetComponent<RectTransform>().localPosition += new Vector3(18, 0, 0);
             toggle1.transform.Find("Background").GetComponent<RectTransform>().sizeDelta += new Vector2(36, 0);
@@ -138,36 +141,27 @@ namespace AliceInCradle.Mono
             toggle1.onValueChanged.AddListener(value => { ConfigManage.NoHpDamage.Value = value; });
             toggle2.GetComponent<RectTransform>().sizeDelta += new Vector2(36, 0);
             toggle2.GetComponent<RectTransform>().localPosition += new Vector3(18, 0, 0);
-            toggle2.transform.Find("Background").GetComponent<RectTransform>().sizeDelta += new Vector2(36,0);
+            toggle2.transform.Find("Background").GetComponent<RectTransform>().sizeDelta += new Vector2(36, 0);
             toggle2.transform.Find("Label").GetComponent<Text>().text = "取消MP损失";
             toggle2.onValueChanged.AddListener(value => { ConfigManage.NoMpDamage.Value = value; });
             toggle3.GetComponent<RectTransform>().sizeDelta += new Vector2(36, 0);
             toggle3.GetComponent<RectTransform>().localPosition += new Vector3(18, 0, 0);
             toggle3.transform.Find("Background").GetComponent<RectTransform>().sizeDelta += new Vector2(36, 0);
             toggle3.transform.Find("Label").GetComponent<Text>().text = "替换宝箱列表";
-            toggle3.onValueChanged.AddListener(value =>
-            {
-                ConfigManage.EnhancedItemList.Value = value;
-            });
+            toggle3.onValueChanged.AddListener(value => { ConfigManage.EnhancedItemList.Value = value; });
 
-            slider1.onValueChanged.AddListener(value =>
-            {
-                ConfigManage.HpMultiply.Value = X.IntC(value);
-            });
-            slider2.onValueChanged.AddListener(value =>
-            {
-                ConfigManage.MpMultiply.Value = X.IntC(value);
-            });
+            slider1.onValueChanged.AddListener(value => { ConfigManage.HpMultiply.Value = X.IntC(value); });
+            slider2.onValueChanged.AddListener(value => { ConfigManage.MpMultiply.Value = X.IntC(value); });
 
             toggle1.isOn = ConfigManage.NoHpDamage.Value;
             toggle2.isOn = ConfigManage.NoMpDamage.Value;
             toggle3.isOn = ConfigManage.EnhancedItemList.Value;
             slider1.value = ConfigManage.HpMultiply.Value;
             slider2.value = ConfigManage.MpMultiply.Value;
-            
+
             ui.AddComponent<ModUIDrag>();
         }
-        
+
         private static int CompareByName(ReelExecuter executor1, ReelExecuter executor2)
         {
             // 先 加法 再 乘法 后 随机
@@ -180,15 +174,14 @@ namespace AliceInCradle.Mono
                 ? null
                 : scripts.FirstOrDefault(script => script.name == "Noel");
         }
-        
+
         private static string PadRightEx(string str, int totalByteCount)
         {
             // 去除 不可见的控制字符和未使用的代码点 例如 (\u0008 BS) WTF 为什么会有这个!
             var s = Regex.Replace(str, @"[\p{C}]", "");
             var coding = Encoding.GetEncoding("UTF-8");
             var count = s.ToCharArray().Count(ch => coding.GetByteCount(ch.ToString()) > 1);
-            return count > totalByteCount ?
-                s.PadRight(count + 2) : s.PadRight(totalByteCount - count);
+            return count > totalByteCount ? s.PadRight(count + 2) : s.PadRight(totalByteCount - count);
         }
     }
 }
