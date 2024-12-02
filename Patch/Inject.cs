@@ -9,6 +9,7 @@ using m2d;
 using nel;
 using XX;
 using static AliceInCradle.ConfigManage;
+using Random = UnityEngine.Random;
 
 // ReSharper disable InconsistentNaming
 
@@ -17,7 +18,7 @@ namespace AliceInCradle.Patch
     public class Inject
     {
         private static readonly ManualLogSource EVENT = Loader.EVENT;
-        
+
         public static readonly Dictionary<string, ReelManager.ItemReelContainer[]> Reels = new();
 
         [HarmonyPatch(typeof(MosaicShower), "FnDrawMosaic")]
@@ -59,7 +60,7 @@ namespace AliceInCradle.Patch
         }
 
         [HarmonyPatch(typeof(ReelManager), "getCurrentItemReel")]
-        [HarmonyPrefix] // 注入 获取当前项目卷轴 替换返回值
+        [HarmonyPrefix] // 注入 获取当前物品卷轴 替换返回值
         public static bool ReelManager_getCurrentItemReel_Prefix(ReelManager __instance,
             ref ReelManager.ItemReelContainer __result)
         {
@@ -76,21 +77,23 @@ namespace AliceInCradle.Patch
                 ir.AContent.ForEach(i =>
                     {
                         orig.AContent.Add(new NelItemEntry(i.Data, i.count, i.grade));
-                        i.count = Random.Range(X.Mx(i.count - 1 , 0) * 100, X.Mx(i.count , 1) * 100);
+                        i.count = Random.Range(X.Mx(i.count - 1, 0) * 100, X.Mx(i.count, 1) * 100);
                     }
                 );
-                Reels.Add(ir.tx_key, new []{orig, ir});
-                EVENT.LogInfo("???ADD:"+ir.tx_key);
+                Reels.Add(ir.tx_key, new[] { orig, ir });
+                EVENT.LogInfo("???ADD:" + ir.tx_key);
             }
+
             __result = EnhancedItemList.Value
                 ? __instance.AStackIR[0]
                 : Reels[__instance.AStackIR[0].tx_key][0];
             return false;
         }
-        
+
         [HarmonyPatch(typeof(M2EventItem_ItemSupply), "getDataList")]
         [HarmonyPrefix]
-        public static bool getDataList_Prefix(M2EventItem_ItemSupply __instance,ref bool is_reel,ref NelItemEntry[] __result)
+        public static bool getDataList_Prefix(M2EventItem_ItemSupply __instance, ref bool is_reel,
+            ref NelItemEntry[] __result)
         {
             var ir = __instance.IReel;
             if (!Reels.ContainsKey(ir.tx_key))
@@ -99,13 +102,13 @@ namespace AliceInCradle.Patch
                 ir.AContent.ForEach(i =>
                     {
                         orig.AContent.Add(new NelItemEntry(i.Data, i.count, i.grade));
-                        i.count = Random.Range(X.Mx(i.count - 1 , 0) * 100, X.Mx(i.count , 1) * 100);
+                        i.count = Random.Range(X.Mx(i.count - 1, 0) * 100, X.Mx(i.count, 1) * 100);
                     }
                 );
-                Reels.Add(ir.tx_key, new []{orig, ir});
-                EVENT.LogInfo("ADD:"+ir.tx_key);
+                Reels.Add(ir.tx_key, new[] { orig, ir });
+                EVENT.LogInfo("ADD:" + ir.tx_key);
             }
-            
+
             is_reel = __instance.LpCon.is_reel;
             __result = EnhancedItemList.Value
                 ? __instance.IReel.ToArray()
@@ -114,7 +117,7 @@ namespace AliceInCradle.Patch
         }
 
         [HarmonyPatch(typeof(NelItem), "fnGetDetailItemReel")]
-        [HarmonyPrefix] // 注入 获取详细卷轴信息 替换返回值
+        [HarmonyPrefix] // 注入 获取物品卷轴详细信息 替换返回值
         public static bool NelItem_fnGetDetailItemReel_Prefix(NelItem Itm, int grade, string def, ref string __result)
         {
             var text = TX.slice(Itm.key, "itemreelC_".Length);
@@ -130,16 +133,18 @@ namespace AliceInCradle.Patch
                             i.count = Random.Range(X.Mx(i.count - 1, 0) * 100, X.Mx(i.count, 1) * 100);
                         }
                     );
-                    Reels.Add(ir.tx_key, new []{orig, ir});
-                    EVENT.LogInfo("ADD:"+ir.tx_key);
+                    Reels.Add(ir.tx_key, new[] { orig, ir });
+                    EVENT.LogInfo("ADD:" + ir.tx_key);
                 }
+
                 __result = EnhancedItemList.Value ? ir.listupItems("／") : Reels[ir.tx_key][0].listupItems("／");
                 return false;
             }
+
             __result = "<ERROR> No Specfic ItemReel:\n" + text;
             return false;
         }
-        
+
         [HarmonyPatch(typeof(EV), "FixedUpdate")]
         [HarmonyPrefix]
         private static bool EV_FixedUpdate_Prefix(EV __instance)
@@ -150,6 +155,7 @@ namespace AliceInCradle.Patch
             {
                 EV.Dbg.changeActivate(!EV.Dbg.isActive() && !EV.Dbg.isELActive());
             }
+
             return false;
         }
 
@@ -165,10 +171,11 @@ namespace AliceInCradle.Patch
                 // 如果 ==applyHpDamageSimple 则 跳过原函数
                 return !sfs[2].GetMethod().Name.Equals("applyHpDamageSimple");
             }
+
             return true;
         }
-        
-        [HarmonyPatch(typeof(PR), "applyDamage", typeof(NelAttackInfo), typeof(bool) )]
+
+        [HarmonyPatch(typeof(PR), "applyDamage", typeof(NelAttackInfo), typeof(bool))]
         [HarmonyPrefix]
         private static bool PR_applyDamage_Prefix(ref int __result)
         {
@@ -176,7 +183,7 @@ namespace AliceInCradle.Patch
             __result = 0;
             return false;
         }
-        
+
         [HarmonyPatch(typeof(M2Attackable), "applyMpDamage")]
         [HarmonyPrefix]
         private static bool M2Attackable_applyMpDamage_Prefix(int val)
@@ -197,7 +204,7 @@ namespace AliceInCradle.Patch
             __result = __instance.mp;
             return false;
         }
-        
+
         [HarmonyPatch(typeof(M2PrSkill), "AtkMul")]
         [HarmonyPrefix]
         private static void M2PrSkill_AtkMul_Prefix(NelAttackInfo Atk, ref float hpdmg, ref float mpdmg)
@@ -205,6 +212,25 @@ namespace AliceInCradle.Patch
             hpdmg *= HpMultiply.Value;
             mpdmg *= MpMultiply.Value;
             // EVENT.LogInfo($"M2PrSkill_AtkMul_Prefix: {hpdmg}, {mpdmg}");
+        }
+
+        [HarmonyPatch(typeof(PR), "applyDamage", typeof(NelAttackInfo), typeof(bool), typeof(string), typeof(bool),
+            typeof(bool))]
+        [HarmonyPrefix]
+        private static bool PR_applyDamage_Prefix(NelAttackInfo Atk)
+        {
+            if (!NoHpDamage.Value) return true;
+            switch (Atk.ndmg)
+            {
+                case NDMG.MAPDAMAGE:
+                case NDMG.MAPDAMAGE_LAVA:
+                case NDMG.MAPDAMAGE_THUNDER:
+                case NDMG.MAPDAMAGE_THUNDER_A:
+                    return false;
+                default:
+                    EVENT.LogInfo("DMG:" + Atk.ndmg);
+                    return true;
+            }
         }
     }
 }
