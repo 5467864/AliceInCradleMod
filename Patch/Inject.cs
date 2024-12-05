@@ -145,20 +145,6 @@ namespace AliceInCradle.Patch
             return false;
         }
 
-        [HarmonyPatch(typeof(EV), "FixedUpdate")]
-        [HarmonyPrefix]
-        private static bool EV_FixedUpdate_Prefix(EV __instance)
-        {
-            __instance.runEvInner(1f);
-            // ReSharper disable once BitwiseOperatorOnEnumWithoutFlags
-            if ((EV.debug & EV.EVDEBUG.ALLOC_CONSOLE) != 0 && IN.getKD(ConfigManage.Debug.Value))
-            {
-                EV.Dbg.changeActivate(!EV.Dbg.isActive() && !EV.Dbg.isELActive());
-            }
-
-            return false;
-        }
-
         [HarmonyPatch(typeof(M2Attackable), "applyHpDamage")]
         [HarmonyPrefix]
         private static bool M2Attackable_applyHpDamage_Prefix(int val)

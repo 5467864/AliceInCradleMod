@@ -9,6 +9,20 @@ namespace AliceInCradle.Patch
 {
     internal class Transformer
     {
+        [HarmonyPatch(typeof(EV), "FixedUpdate")]
+        [HarmonyTranspiler]
+        public static IEnumerable<CodeInstruction> EV_FixedUpdate_Transpiler(
+            IEnumerable<CodeInstruction> instructions)
+        {
+            // 修改官服调试工具界面显示的按键
+            return new CodeMatcher(instructions)
+                .MatchForward(false,
+                    new CodeMatch(i => i.opcode == OpCodes.Ldc_I4_S && i.operand.ToString() == "100")
+                )
+                .SetOperandAndAdvance((int)ConfigManage.Debug.Value)
+                .InstructionEnumeration();
+        }
+        
         [HarmonyPatch(typeof(ReelExecuter), "applyEffectToIK")]
         [HarmonyTranspiler]
         public static IEnumerable<CodeInstruction> ReelExecuter_applyEffectToIK_Transpiler(
