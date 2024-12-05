@@ -36,8 +36,6 @@ namespace AliceInCradle.Mono
             UI = Instantiate(_ui);
             // UI功能绑定
             BindUI(UI);
-            // 获取 诺艾儿 实例
-            Noel = GetNoel();
         }
 
         public void Start()
@@ -166,13 +164,6 @@ namespace AliceInCradle.Mono
         {
             // 先 加法 再 乘法 后 随机
             return string.CompareOrdinal(executor1.etype.ToString(), executor2.etype.ToString());
-        }
-
-        private static PRNoel GetNoel()
-        {
-            return FindObjectsOfType<PRNoel>() is not { } scripts
-                ? null
-                : scripts.FirstOrDefault(script => script.name == "Noel");
         }
 
         private static string PadRightEx(string str, int totalByteCount)

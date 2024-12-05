@@ -1,4 +1,5 @@
-﻿using BepInEx.Logging;
+﻿using System.Linq;
+using BepInEx.Logging;
 using UnityEngine;
 using nel;
 using XX;
@@ -8,11 +9,13 @@ namespace AliceInCradle.Mono
     public class Plugin : MonoBehaviour
     {
         private static readonly ManualLogSource Event = Loader.EVENT;
+
         private void Awake()
         {
+            Loader.Noel = GetNoel();
             gameObject.AddComponent<ModUI>();
         }
-        
+
         private void Update()
         {
             if (IN.getKD(ConfigManage.IMGUI.Value))
@@ -38,13 +41,13 @@ namespace AliceInCradle.Mono
         private void OnDestroy()
         {
             Loader.WindowDisplay = false;
-            Event.LogMessage("当前场景生命周期结束"); 
+            Event.LogMessage("当前场景生命周期结束");
         }
-        
+
         private void OnApplicationQuit()
         {
             ConfigManage.Save();
-            Event.LogWarning("退出游戏!"); 
+            Event.LogWarning("退出游戏!");
         }
 
         private void DoMyWindow(int windowID)
@@ -62,6 +65,11 @@ namespace AliceInCradle.Mono
 
             GUILayout.EndArea();
             GUI.DragWindow();
+        }
+
+        private static PRNoel GetNoel()
+        {
+            return FindObjectsOfType<PRNoel>().FirstOrDefault();
         }
     }
 }
