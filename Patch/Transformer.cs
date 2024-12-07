@@ -9,20 +9,6 @@ namespace AliceInCradle.Patch
 {
     internal class Transformer
     {
-        [HarmonyPatch(typeof(EV), "FixedUpdate")]
-        [HarmonyTranspiler]
-        public static IEnumerable<CodeInstruction> EV_FixedUpdate_Transpiler(
-            IEnumerable<CodeInstruction> instructions)
-        {
-            // 修改官服调试工具界面显示的按键
-            return new CodeMatcher(instructions)
-                .MatchForward(false,
-                    new CodeMatch(i => i.opcode == OpCodes.Ldc_I4_S && i.operand.ToString() == "100")
-                )
-                .SetOperandAndAdvance((int)ConfigManage.Debug.Value)
-                .InstructionEnumeration();
-        }
-        
         [HarmonyPatch(typeof(ReelExecuter), "applyEffectToIK")]
         [HarmonyTranspiler]
         public static IEnumerable<CodeInstruction> ReelExecuter_applyEffectToIK_Transpiler(
@@ -33,7 +19,7 @@ namespace AliceInCradle.Patch
                 .MatchForward(false,
                     new CodeMatch(i => i.opcode == OpCodes.Ldc_I4_S && i.operand.ToString() == "99")
                 )
-                .SetInstructionAndAdvance(new CodeInstruction(OpCodes.Ldc_I4, 999))
+                .SetInstructionAndAdvance(new CodeInstruction(OpCodes.Ldc_I4, ConfigManage.MaxCount.Value))
                 .InstructionEnumeration();
         }
 
@@ -53,7 +39,7 @@ namespace AliceInCradle.Patch
                 { "nodamage", "无伤害" },
                 { "weak", "虚弱" },
                 { "allskill", "所有技能" },
-                
+
                 { "Danger", "危险" },
                 { "HP/MP", "血量/魔力" },
                 { "Item", "物品" },
@@ -65,14 +51,14 @@ namespace AliceInCradle.Patch
                 { "Lock Dangerousness", "锁定危险性" },
                 { "Allow fast travel in night time", "允许夜间快速旅行" },
                 { "Lock weather", "锁定天气" },
-                
+
                 { "Fine Columns", "Fine Columns" },
                 { "Auto refine variables ", "Auto refine variables " },
                 { "KILL", "自杀" },
                 { "HP", "血量" },
                 { "MP", "魔力" },
                 { "Pos", "坐标" },
-                
+
                 { "Grade", "等级" },
                 { "Get!", "获得!" },
                 { "Money", "金钱" }

@@ -19,13 +19,15 @@ public static class ConsoleHelper
     //声明了一个外部方法，用于设置当前控制台的字体，返回值为布尔型，表示是否成功。
     [return: MarshalAs(UnmanagedType.Bool)]
     [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-    internal static extern bool SetCurrentConsoleFontEx(IntPtr hConsoleOutput, bool MaximumWindow, ref FontInfo ConsoleCurrentFontEx);
+    internal static extern bool SetCurrentConsoleFontEx(IntPtr hConsoleOutput, bool MaximumWindow,
+        ref FontInfo ConsoleCurrentFontEx);
 
     //声明了一个外部方法，用于获取当前控制台的字体，返回值为布尔型。
     [return: MarshalAs(UnmanagedType.Bool)]
     [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-    internal static extern bool GetCurrentConsoleFontEx(IntPtr hConsoleOutput, bool MaximumWindow, ref FontInfo ConsoleCurrentFontEx);
-    
+    internal static extern bool GetCurrentConsoleFontEx(IntPtr hConsoleOutput, bool MaximumWindow,
+        ref FontInfo ConsoleCurrentFontEx);
+
     // 通过调用 GetStdHandle 方法获取当前控制台的输出句柄。
     private static readonly IntPtr ConsoleOutputHandle = GetStdHandle(StandardOutputHandle);
 
@@ -33,16 +35,16 @@ public static class ConsoleHelper
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
     public struct FontInfo
     {
-        internal int cbSize;        // 结构体的大小（以字节为单位）
-        internal int nFont;         // 系统控制台字体表中字体的索引
-        internal short FontWidth;   // 字体宽度
-        public short FontSize;      // 字体大小
-        public int FontFamily;      // 字体间距和系列（如固定宽度 TrueType）
-        public int FontWeight;      // 字体粗细。 粗细范围为 100 到 1000，按 100 的倍数表示。 例如，正常粗细为 400，而 700 为粗体。
+        internal int cbSize; // 结构体的大小（以字节为单位）
+        internal int nFont; // 系统控制台字体表中字体的索引
+        internal short FontWidth; // 字体宽度
+        public short FontSize; // 字体大小
+        public int FontFamily; // 字体间距和系列（如固定宽度 TrueType）
+        public int FontWeight; // 字体粗细。 粗细范围为 100 到 1000，按 100 的倍数表示。 例如，正常粗细为 400，而 700 为粗体。
 
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 32)]
         //[MarshalAs(UnmanagedType.ByValArray, ArraySubType = UnmanagedType.wc, SizeConst = 32)]
-        public string FontName;     // 字体的名称（如 Courier 或 Arial）
+        public string FontName; // 字体的名称（如 Courier 或 Arial）
     }
 
     public static FontInfo[] SetCurrentFont(string font, short fontSize = 0)
@@ -82,6 +84,7 @@ public static class ConsoleHelper
 
             return new[] { before, set, after };
         }
+
         var er = Marshal.GetLastWin32Error();
         Console.WriteLine("Get error " + er);
         throw new System.ComponentModel.Win32Exception(er);

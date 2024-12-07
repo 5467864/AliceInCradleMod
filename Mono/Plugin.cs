@@ -3,6 +3,7 @@ using BepInEx.Logging;
 using UnityEngine;
 using nel;
 using XX;
+using static AliceInCradle.ConfigManage;
 
 namespace AliceInCradle.Mono
 {
@@ -18,15 +19,15 @@ namespace AliceInCradle.Mono
 
         private void Update()
         {
-            if (IN.getKD(ConfigManage.IMGUI.Value))
+            if (IN.getKD(IMGUI.Value))
             {
                 Loader.WindowDisplay = !Loader.WindowDisplay;
             }
 
-            if (IN.getKD(ConfigManage.UGUI.Value))
+            if (IN.getKD(UGUI.Value))
             {
-                ConfigManage.Active.Value = !ModUI.UI.activeSelf;
-                ModUI.UI.SetActive(ConfigManage.Active.Value);
+                Active.Value = !ModUI.UI.activeSelf;
+                ModUI.UI.SetActive(Active.Value);
             }
         }
 
@@ -54,13 +55,15 @@ namespace AliceInCradle.Mono
         {
             GUILayout.BeginArea(new Rect(10f, 20f, 480f, 250f));
 
-            ConfigManage.NoMosaic.Value = GUILayout.Toggle(ConfigManage.NoMosaic.Value, "无马赛克", GUILayout.Height(24f));
-            ConfigManage.NoHpDamage.Value = GUILayout.Toggle(ConfigManage.NoHpDamage.Value, "取消HP损失", GUILayout.Height(24f));
-            ConfigManage.NoMpDamage.Value = GUILayout.Toggle(ConfigManage.NoMpDamage.Value, "取消MP损失", GUILayout.Height(24f));
+            NoMosaic.Value = GUILayout.Toggle(NoMosaic.Value, "无马赛克", GUILayout.Height(24f));
+            NoHpDamage.Value = GUILayout.Toggle(NoHpDamage.Value, "取消HP损失", GUILayout.Height(24f));
+            NoMpDamage.Value = GUILayout.Toggle(NoMpDamage.Value, "取消MP损失", GUILayout.Height(24f));
             if (GUILayout.Button("输出金币", GUILayout.Height(24f)))
             {
                 Event.LogInfo(
-                    $"GOLD: {CoinStorage.Acount[0],-6}CRAFTS: {CoinStorage.Acount[1],-6}JUICE: {CoinStorage.Acount[2],-6}");
+                    $"GOLD: {CoinStorage.Acount[0],-6}" +
+                    $"CRAFTS: {CoinStorage.Acount[1],-6}" +
+                    $"JUICE: {CoinStorage.Acount[2],-6}");
             }
 
             GUILayout.EndArea();

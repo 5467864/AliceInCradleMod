@@ -64,11 +64,6 @@ namespace AliceInCradle.Mono
             _toggle3.isOn = ConfigManage.EnhancedItemList.Value;
         }
 
-        // private void OnDestroy()
-        // {
-        //     EVENT.LogInfo("ModUI 对象销毁!");
-        // }
-
         private static void BindUI(GameObject ui)
         {
             // var bg = ui.transform.Find("BG").GetComponent<Image>();
@@ -89,7 +84,9 @@ namespace AliceInCradle.Mono
             btn1.onClick.AddListener(() =>
             {
                 EVENT.LogInfo(
-                    $"GOLD: {CoinStorage.Acount[0],-9}CRAFTS: {CoinStorage.Acount[1],-9}JUICE: {CoinStorage.Acount[2],-9}");
+                    $"GOLD: {CoinStorage.Acount[0],-9}" +
+                    $"CRAFTS: {CoinStorage.Acount[1],-9}" +
+                    $"JUICE: {CoinStorage.Acount[2],-9}");
             });
             btn2.transform.Find("Text").GetComponent<Text>().text = "输出背包物品";
             btn2.onClick.AddListener(() =>
@@ -99,7 +96,11 @@ namespace AliceInCradle.Mono
                 foreach (var row in StInventory.ARow)
                 {
                     EVENT.LogInfo(
-                        $"{PadRightEx(row.Data.getLocalizedName(0), 20)}序号: {row.Info.newer,-4} 数量: {row.Info.total,-4} 堆叠: {StInventory.getItemStockable(row.Data),-4} ({TX.join(",", row.Info.Agrade)})");
+                        $"{PadRightEx(row.Data.getLocalizedName(0), 20)}" +
+                        $"序号: {row.Info.newer,-4} " +
+                        $"数量: {row.Info.total,-4} " +
+                        $"堆叠: {StInventory.getItemStockable(row.Data),-4} " +
+                        $"({TX.join(",", row.Info.Agrade)})");
                 }
             });
             btn3.transform.Find("Text").GetComponent<Text>().text = "无限存储";

@@ -9,7 +9,6 @@ using m2d;
 using nel;
 using XX;
 using static AliceInCradle.ConfigManage;
-using Random = UnityEngine.Random;
 
 // ReSharper disable InconsistentNaming
 
@@ -46,6 +45,20 @@ namespace AliceInCradle.Patch
             // EVENT.LogInfo("SceneGame_Awake");
             Loader.Plugin = new GameObject("PluginObject");
             Loader.Plugin.AddComponent(typeof(Plugin));
+        }
+
+        [HarmonyPatch(typeof(EV), "FixedUpdate")]
+        [HarmonyPrefix] // 修改官服调试工具界面显示的按键
+        private static bool EV_FixedUpdate_Prefix(EV __instance)
+        {
+            __instance.runEvInner(1f);
+            // ReSharper disable once BitwiseOperatorOnEnumWithoutFlags
+            if ((EV.debug & EV.EVDEBUG.ALLOC_CONSOLE) != 0 && IN.getKD(ConfigManage.Debug.Value))
+            {
+                EV.Dbg.changeActivate(!EV.Dbg.isActive() && !EV.Dbg.isELActive());
+            }
+
+            return false;
         }
 
         [HarmonyPatch(typeof(NelItemManager), "newGame")]

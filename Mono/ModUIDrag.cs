@@ -3,18 +3,18 @@ using UnityEngine.EventSystems;
 
 namespace AliceInCradle.Mono
 {
-    public class ModUIDrag : MonoBehaviour,IBeginDragHandler, IDragHandler ,IEndDragHandler
+    public class ModUIDrag : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
     {
         public static Vector3 Pos;
-        private Vector3 _offset;             // UI和鼠标指针位置的偏移
-        
-        private float _minWidth;             // 水平最小拖拽范围
-        private float _maxWidth ;            // 水平最大拖拽范围
-        private float _minHeight;            // 垂直最小拖拽范围  
-        private float _maxHeight;            // 垂直最大拖拽范围
-        private float _rangeX;               // 水平拖拽范围
-        private float _rangeY;               // 垂直拖拽范围
-        
+        private Vector3 _offset; // UI和鼠标指针位置的偏移
+
+        private float _minWidth; // 水平最小拖拽范围
+        private float _maxWidth; // 水平最大拖拽范围
+        private float _minHeight; // 垂直最小拖拽范围  
+        private float _maxHeight; // 垂直最大拖拽范围
+        private float _rangeX; // 水平拖拽范围
+        private float _rangeY; // 垂直拖拽范围
+
         private RectTransform _rt;
 
         public void Start()
@@ -25,20 +25,23 @@ namespace AliceInCradle.Mono
             {
                 _rt.position = Pos;
             }
-            _minWidth = _rt.rect.width / 2;                           
+
+            _minWidth = _rt.rect.width / 2;
             _maxWidth = Screen.width - (_rt.rect.width / 2);
             _minHeight = _rt.rect.height / 2;
             _maxHeight = Screen.height - (_rt.rect.height / 2);
         }
+
         private void Update()
         {
             DragRangeLimit();
         }
+
         private void OnDestroy()
         {
             ConfigManage.Pos.Value = Pos;
         }
-        
+
         // 拖拽范围限制
         private void DragRangeLimit()
         {
@@ -48,23 +51,26 @@ namespace AliceInCradle.Mono
             //更新位置
             _rt.position = new Vector3(_rangeX, _rangeY, 0);
         }
-        
+
         // 开始拖拽
         public void OnBeginDrag(PointerEventData eventData)
         {
             //将屏幕坐标转换成世界坐标
-            if (RectTransformUtility.ScreenPointToWorldPointInRectangle(_rt, eventData.position, null, out var globalMousePos))
+            if (RectTransformUtility.ScreenPointToWorldPointInRectangle(_rt, eventData.position, null,
+                    out var globalMousePos))
             {
                 //计算UI和指针之间的位置偏移量
                 _offset = _rt.position - globalMousePos;
             }
         }
+
         // 正在拖拽
         public void OnDrag(PointerEventData eventData)
         {
             SetDraggedPosition(eventData);
             // UImage.transform.position = eventData.position - _offset;
         }
+
         // 结束拖拽
         public void OnEndDrag(PointerEventData eventData)
         {
@@ -75,7 +81,8 @@ namespace AliceInCradle.Mono
         // 更新位置
         private void SetDraggedPosition(PointerEventData eventData)
         {
-            if (RectTransformUtility.ScreenPointToWorldPointInRectangle(_rt, eventData.position, null, out var globalMousePos))
+            if (RectTransformUtility.ScreenPointToWorldPointInRectangle(_rt, eventData.position, null,
+                    out var globalMousePos))
             {
                 _rt.position = _offset + globalMousePos;
             }
